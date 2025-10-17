@@ -23,89 +23,209 @@ const steps = [
   document.getElementById('step4')
 ];
 
+const fromSelect = document.getElementById('from');
+const toSelect = document.getElementById('to');
+const progressBar = document.getElementById('progressBar');
+
 // === STATE ===
 let bookingData = {};
 let selectedFlight = null;
 
 // === FLIGHT DATABASE (All days in October) ===
 const flights = [];
-const origins = ["Manila"];
-const destinations = ["Cebu", "Davao", "Iloilo"];
-const terminals = ["T1", "T2", "T3"];
+const origins = ["Manila", "Cebu", "Davao", "Iloilo"];
+const destinations = ["Manila", "Cebu", "Davao", "Iloilo"];
+const terminals = ["Terminal 1", "Terminal 2", "Terminal 3"];
 
-for (let day = 1; day <= 31; day++) {
+for (let day = 18; day <= 31; day++) {
   const date = `2025-10-${day.toString().padStart(2, '0')}`;
-
-  destinations.forEach((to, index) => {
-    const flightNo = `FL ${100 + day + index}`;
-    const from = origins[0];
-    const time = `${8 + index * 3}:00`; // 08:00, 11:00, 14:00
-    const price = 2500 + index * 500;
-    const fareType = index % 2 === 0 ? "Promo" : "Regular";
-    const seats = 30 + Math.floor(Math.random() * 40);
-    const duration = "1h 20m";
-    const terminal = terminals[index % terminals.length];
-
-    flights.push({
-      flightNo,
-      from,
-      to,
-      date,
-      time,
-      price,
-      fareType,
-      seats,
-      duration,
-      terminal
+  
+  origins.forEach(from => {
+    destinations.forEach(to => {
+      if (from === to) return; // skip same city
+      
+      const flightNo = `FL ${100 + day + Math.floor(Math.random() * 50)}`;
+      const time = `${8 + Math.floor(Math.random() * 10)}:00`;
+      const price = 2500 + Math.floor(Math.random() * 1500);
+      const fareType = Math.random() > 0.5 ? "Promo" : "Regular";
+      const seats = 30 + Math.floor(Math.random() * 40);
+      const duration = "1h 20m";
+      const terminal = "T" + (1 + Math.floor(Math.random() * 3));
+      
+      flights.push({ flightNo, from, to, date, time, price, fareType, seats, duration, terminal });
     });
   });
 }
 
-// === STEP FUNCTIONS ===
+// === UTILITY FUNCTIONS ===
+
+// Update TO options based on FROM selection
+function updateDestinationOptions() {
+  const fromValue = fromSelect.value;
+
+  Array.from(toSelect.options).forEach(option => {
+    option.hidden = false; // show all first
+  });
+
+  // Hide the same option in "To"
+  if (fromValue) {
+    const sameOption = Array.from(toSelect.options).find(opt => opt.value === fromValue);
+    if (sameOption) sameOption.hidden = true;
+  }
+}
+
+// Update FROM options based on TO selection
+function updateOriginOptions() {
+  const toValue = toSelect.value;
+
+  Array.from(fromSelect.options).forEach(option => {
+    option.hidden = false; // show all first
+  });
+
+  // Hide the same option in "From"
+  if (toValue) {
+    const sameOption = Array.from(fromSelect.options).find(opt => opt.value === toValue);
+    if (sameOption) sameOption.hidden = true;
+  }
+}
+
+// Adjust modal height dynamically
+function adjustModalHeight() {
+  const modal = document.querySelector('.background-process');
+
+  // If the modal is taller than the viewport, let it scroll naturally
+  if (modal.scrollHeight > window.innerHeight * 0.8) {
+    modal.style.top = '20px';
+    modal.style.transform = 'translateX(-50%)';
+  } else {
+    modal.style.top = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+  }
+}
+
+new ResizeObserver(adjustModalHeight).observe(document.querySelector('.background-process'));
+
+// === CORE NAVIGATION ===
 function showSection(section) {
   [home, booking, flightsSection, passengerSection, summarySection, successSection]
     .forEach(sec => sec.classList.add('hidden'));
   section.classList.remove('hidden');
+
+  // Hide progress bar on home and success screens
+  if (section === home || section === successSection) {
+    progressBar.style.display = 'none';
+  } else {
+    progressBar.style.display = 'flex';
+  }
 }
 
 function setActiveStep(stepIndex) {
   steps.forEach((s, i) => {
-    s.classList.toggle('active', i === stepIndex);
+    if (i < stepIndex) {
+      s.classList.add('completed');  // all previous steps stay colored
+      s.classList.remove('active');
+    } else if (i === stepIndex) {
+      s.classList.add('active');
+      s.classList.remove('completed');
+    } else {
+      s.classList.remove('active', 'completed');
+    }
   });
 }
 
 // === EVENT LISTENERS ===
 
+// Listen for changes
+fromSelect.addEventListener('change', updateDestinationOptions);
+toSelect.addEventListener('change', updateOriginOptions);
+
 // Home → Booking
 bookFlightBtn.addEventListener('click', () => {
   showSection(booking);
   setActiveStep(0);
-});
 
-// Show/hide return date depending on flight type
-flightTypeSelect.addEventListener('change', () => {
-  returnDateContainer.style.display = flightTypeSelect.value === 'oneway' ? 'none' : 'block';
+  // Show progress wrapper
+  document.querySelector('.background-process').style.display = 'block';
+
+  // Hide logo and login-signup
+  document.querySelector('.logo').style.display = 'none';
+  document.querySelector('.login-signup').style.display = 'none';
+
+  // Blur and fade background image
+  document.querySelector('.background-img').classList.add('blurred');
 });
 
 // Booking → Flights
 bookingForm.addEventListener('submit', (e) => {
   e.preventDefault();
+
+  const departDate = document.getElementById('departDate').value;
+  const returnDate = document.getElementById('returnDate').value;
+  const flightType = flightTypeSelect.value;
+  const errorDisplay = document.getElementById('bookingError');
+
+  // Clear previous error
+  errorDisplay.textContent = '';
+
+  // --- VALIDATION: Return date must be later than depart date ---
+  if (flightType === 'round') {
+    if (!returnDate) {
+      errorDisplay.textContent = '⚠ Please select a return date for a round trip.';
+      return;
+    }
+
+    const depart = new Date(departDate);
+    const ret = new Date(returnDate);
+
+    if (ret <= depart) {
+      errorDisplay.textContent = '⚠ Return date must be later than the departure date.';
+      return;
+    }
+  }
+
+  // Clear error and continue
+  errorDisplay.textContent = '';
+
   bookingData = {
     from: document.getElementById('from').value.trim(),
     to: document.getElementById('to').value.trim(),
-    type: flightTypeSelect.value,
-    departDate: document.getElementById('departDate').value,
-    returnDate: document.getElementById('returnDate').value,
+    type: flightType,
+    departDate: departDate,
+    returnDate: returnDate,
     passengers: parseInt(document.getElementById('passengers').value)
   };
+
   displayFlights();
+
+  document.querySelector('.flight-selection-process').style.display = 'block';
+});
+
+// Booking flight type toggle
+flightTypeSelect.addEventListener('change', () => {
+  const backgroundProcess = document.querySelector('.background-process');
+
+  if (flightTypeSelect.value === 'oneway') {
+    returnDateContainer.style.display = 'none';
+  } else {
+    returnDateContainer.style.display = 'flex';
+    returnDateContainer.style.flexDirection = 'column';
+  }
+
+  // --- Dynamic height adjustment ---
+  backgroundProcess.style.height = 'auto';
+  const newHeight = backgroundProcess.scrollHeight + 'px';
+  backgroundProcess.style.height = newHeight;
 });
 
 // Back to booking
 backToBooking.addEventListener('click', () => {
   showSection(booking);
   setActiveStep(0);
+
+  document.querySelector('.flight-selection-process').style.display = 'none';
 });
+
+// === FEATURE-SPECIFIC FUNCTIONS ===
 
 // === FLIGHT LIST GENERATION ===
 function displayFlights() {
@@ -223,4 +343,20 @@ function showSummary() {
 document.getElementById('bookNowBtn').addEventListener('click', () => {
   showSection(successSection);
   steps.forEach(s => s.classList.remove('active'));
+});
+
+// === BOOK ANOTHER (Back to Home from success page) ===
+document.getElementById('backToHomeSuccess').addEventListener('click', () => {
+  showSection(home);
+  steps.forEach(s => s.classList.remove('active'));
+
+  // Restore visibility of logo and login-signup
+  document.querySelector('.logo').style.display = 'block';
+  document.querySelector('.login-signup').style.display = 'flex';
+
+  // Hide modals and remove blur
+  document.querySelector('.background-process').style.display = 'none';
+  document.querySelector('.background-img').classList.remove('blurred');
+
+  document.querySelector('.flight-selection-process').style.display = 'none';
 });

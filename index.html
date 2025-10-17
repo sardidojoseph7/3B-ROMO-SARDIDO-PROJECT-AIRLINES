@@ -3,91 +3,167 @@
 <head>
   <meta charset="UTF-8">
   <title>SkyHigh Airlines Booking</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  
+  <div class="main">
 
-  <!-- Header -->
-  <header>
-    <h1>SkyHigh Airlines ✈</h1>
-  </header>
+    <section class="img">
+      <img src="images/plane.png" alt="Plane" class="background-img">
+    </section>
+    
+  <div class="content">
 
-  <!-- Progress Indicator -->
-  <div class="progress-bar">
-    <div class="step active" id="step1">1. Booking Details</div>
-    <div class="step" id="step2">2. Select Flight</div>
-    <div class="step" id="step3">3. Passenger Info</div>
-    <div class="step" id="step4">4. Summary</div>
-  </div>
+    <header class="logo">
+      <h1>SkyHigh Airlines</h1>
+    </header>
 
-  <!-- Home Section -->
-  <section id="home">
-    <h2>Welcome to SkyHigh Airlines</h2>
-    <p>Book your next adventure with ease.</p>
-    <button id="bookFlightBtn">Book a Flight</button>
-  </section>
+    <div class="login-signup">
 
-  <!-- Booking Section -->
-  <section id="booking" class="hidden">
-    <h2>Booking Details</h2>
-    <form id="bookingForm">
-      <div>
-        <label>From:</label>
-        <input type="text" id="from" placeholder="e.g. Manila" required>
-      </div>
-      <div>
-        <label>To:</label>
-        <input type="text" id="to" placeholder="e.g. Cebu" required>
-      </div>
-      <div>
-        <label>Flight Type:</label>
-        <select id="flightType" required>
-          <option value="round">Round Trip</option>
-          <option value="oneway">One Way</option>
-        </select>
-      </div>
-      <div>
-        <label>Depart Date:</label>
-        <input type="date" id="departDate" required>
-      </div>
-      <div id="returnDateContainer">
-        <label>Return Date:</label>
-        <input type="date" id="returnDate">
-      </div>
-      <div>
-        <label>Passengers:</label>
-        <input type="number" id="passengers" min="1" value="1" required>
-      </div>
-      <button type="submit">Search Flights</button>
-    </form>
-  </section>
+      <svg class="icon" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" />
+        <line x1="21" y1="21" x2="15" y2="15" />
+      </svg>
 
-  <!-- Flight Section -->
-  <section id="flights" class="hidden">
-    <h2>Select a Flight</h2>
-    <div id="flightList"></div>
-    <button class="backBtn" id="backToBooking">← Back</button>
-  </section>
+      <span class="login">Login</span>
+      <span class="separator">/</span>
+      <span class="signup">Signup</span>
 
-  <!-- Passenger Info Section -->
-  <section id="passenger" class="hidden">
-    <h2>Passenger Information</h2>
-    <form id="passengerForm"></form>
-  </section>
+    </div>
 
-  <!-- Summary Section -->
-  <section id="summary" class="hidden">
-    <h2>Booking Summary</h2>
-    <div id="summaryDetails"></div>
-    <button id="bookNowBtn">Book Now</button>
-  </section>
+    <section id="home">
 
-  <!-- Success Section -->
-  <section id="success" class="hidden">
-    <h2>✅ Booking Successful!</h2>
-    <p>Your flight has been booked. Thank you for choosing SkyHigh Airlines.</p>
-  </section>
+      <h2><span class="highlight">Book</span> Your</h2>
+      <h2>Dream <span class="highlight">Flights</span></h2>
+      <h2>Now!</h2>
+      <button id="bookFlightBtn">Book a Flight</button>
 
-  <script src="script.js"></script>
+    </section>
+
+    <div class="background-process">
+
+    <div class="progress-bar" id="progressBar">
+
+      <div class="step active" id="step1"></div>
+      <div class="step" id="step2"></div>
+      <div class="step" id="step3"></div>
+      <div class="step" id="step4"></div>
+
+    </div>
+
+    <section id="booking" class="hidden">
+
+      <h2>Booking Details</h2>
+
+      <form id="bookingForm">
+
+        <div>
+
+          <label>From:</label>
+
+          <select id="from" required>
+            <option value="" disabled selected hidden>Select Origin</option>
+            <option value="Manila">Manila</option>
+            <option value="Cebu">Cebu</option>
+            <option value="Davao">Davao</option>
+            <option value="Iloilo">Iloilo</option>
+          </select>
+
+        </div>
+
+        <div>
+
+          <label>To:</label>
+
+           <select id="to" required>
+            <option value="" disabled selected hidden>Select Destination</option>
+            <option value="Manila">Manila</option>
+            <option value="Cebu">Cebu</option>
+            <option value="Davao">Davao</option>
+            <option value="Iloilo">Iloilo</option>
+          </select>
+
+        </div>
+
+        <div>
+
+          <label>Flight Type:</label>
+
+          <select id="flightType" required>
+            <option value="round">Round Trip</option>
+            <option value="oneway">One Way</option>
+          </select>
+
+        </div>
+
+        <div>
+          <label>Depart Date:</label>
+          <input type="date" id="departDate" required>
+        </div>
+
+        <div id="returnDateContainer">
+          <label>Return Date:</label>
+          <input type="date" id="returnDate">
+        </div>
+
+        <div>
+          <label>Passengers:</label>
+          <input type="number" id="passengers" min="1" value="1" required>
+        </div>
+
+        <div class="button-container">
+          <button type="submit">Search Flights</button>
+          <button id="backToHome">Return Home</button>
+        </div>
+
+      </form>
+
+      <p id="bookingError" class="error-message"</p>
+
+    </section>
+
+    <div class="flight-selection-process">
+
+    <section id="flights" class="hidden">
+      
+      <h2>Select a Flight</h2>
+      <div id="flightList"></div>
+      <button class="backBtn" id="backToBooking">Previous</button>
+
+    </section>
+
+    <section id="passenger" class="hidden">
+
+      <h2>Passenger Information</h2>
+      <form id="passengerForm"></form>
+
+    </section>
+
+    <section id="summary" class="hidden">
+
+      <h2>Booking Summary</h2>
+      <div id="summaryDetails"></div>
+      <button id="bookNowBtn">Book Now</button>
+
+    </section>
+
+    <section id="success" class="hidden">
+
+      <h2>Booking Successful!</h2>
+      <p>Your flight has been booked. Thank you for choosing SkyHigh Airlines.</p>
+      <button id="backToHomeSuccess">Book Another</button>
+
+    </section>
+
+    <script src="script.js"></script>
+
+    </div>
+
+    </div>
+
+    </div>
+
 </body>
 </html>

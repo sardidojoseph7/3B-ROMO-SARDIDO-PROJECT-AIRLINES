@@ -1,31 +1,13 @@
-body {
-  font-family: Arial, sans-serif;
+html, body {
+  font-family: 'Poppins', Arial, sans-serif;
   background: #f4f6f9;
   margin: 0;
-}
-
-header {
-  background: #003366;
-  color: white;
-  text-align: center;
-  padding: 15px 0;
-}
-
-section {
-  max-width: 800px;
-  margin: 20px auto;
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.hidden {
-  display: none;
+  height: 100%;
+  overflow-y: auto;
 }
 
 button {
-  background: #003366;
+  background: #007BFF;
   color: white;
   border: none;
   border-radius: 4px;
@@ -34,7 +16,7 @@ button {
 }
 
 button:hover {
-  background: #0055aa;
+  background: #0055aa ;
 }
 
 form div {
@@ -51,27 +33,239 @@ input, select {
   box-sizing: border-box;
 }
 
-.progress-bar {
+.main {
+    max-width: 1521px;
+    width: 100%;
+    height: 728px;
+    margin: 0 auto;
+    position: relative;
+}
+
+#home {
+  position: absolute;
+  top : 200px;
+  left: 50px;
+  font-size: xx-large;
+  line-height: 0.5;
+}
+
+.logo {
+  position: absolute;
+  color: #007BFF;
+  text-align: center;
+  margin: 20px;
+  top: 0px;
+}
+
+.img {
+  position: relative;
+  height: 550px;
+}
+
+.background-img {
+  position: absolute;
+  top: 60%;
+  left: 40%;
+  transform: translate(-50%, -50%) scale(0.8);
+  transform: translate(-30%, -50%) scale(0.8);
+}
+
+.background-img.blurred {
+  filter: blur(6px);
+  opacity: 0.5;
+  transition: all 0.5s ease;
+}
+
+.background-img {
+  transition: all 0.5s ease;
+}
+
+#bookFlightBtn {
+  margin-top: 40px;
+  width: 130px;
+  height: 50px;
+  border: none;
+  border-radius: 6px;
+  background-color: #007BFF;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.4);
+}
+
+#bookFlightBtn:hover {
+  background-color: #0069d9;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.highlight {
+  color: #007BFF;
+}
+
+.background-process {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  width: 550px;
+  min-height: 650px;
+  background: white;
+  padding: 20px 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  overflow-y: auto;
+  max-height: 80vh;
+   overflow-y: auto; 
+  overflow-x: hidden;
+}
+
+.background-process::-webkit-scrollbar {
+  width: 8px;
+}
+.background-process::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 6px;
+}
+.background-process::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+.hidden {
+  display: none;
+}
+
+#booking {
+  position: relative;
+  width: 100%;
+  transform: none;
+  left: 0;
+  top: 0;
+}
+
+#bookingForm {
+  margin-top: 20px;
+}
+
+#bookingForm button[type="submit"] {
+  width: auto;
+  display: inline-block;
+}
+
+.button-container {
   display: flex;
   justify-content: space-between;
-  max-width: 800px;
-  margin: 20px auto;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.button-container button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.progress-bar {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: 30px 0 50px;
   padding: 0 10px;
+  counter-reset: step;
 }
 
 .step {
+  position: relative;
   flex: 1;
   text-align: center;
-  padding: 10px;
-  background: #ccc;
-  margin: 0 5px;
-  border-radius: 20px;
   font-size: 14px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 0.3s ease;
 }
 
-.step.active {
-  background: #003366;
-  color: white;
+/* Step circle */
+.step::before {
+  content: counter(step);
+  counter-increment: step;
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  border: 2px solid #ccc;
+  display: inline-block;
+  border-radius: 50%;
+  background-color: #fff;
+  color: #999;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+/* Connector line */
+.step::after {
+  content: '';
+  position: absolute;
+  top: 17px;
+  left: 50%;
+  width: 100%;
+  height: 3px;
+  background-color: #ccc;
+  z-index: -1;
+  transition: background 0.3s ease;
+}
+
+/* Remove line after the last step */
+.step:last-child::after {
+  display: none;
+}
+
+/* Active and completed steps */
+.step.active,
+.step.completed {
+  color: #007BFF;
+}
+
+/* Active/completed circle */
+.step.active::before,
+.step.completed::before {
+  border-color: #007BFF;
+  background-color: #007BFF;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+/* Fill lines between completed/active steps */
+.step.completed::after,
+.step.active::after {
+  background-color: #007BFF;
+}
+
+/* Smooth highlight on hover */
+.step:hover {
+  color: #0055aa;
+}
+
+.flight-selection-process {
+  display: none;
+  position: absolute;
+  top: 330px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 550px;
+  height: 650px;
+  margin: 20px auto;
+  margin-top: 100px;
+  
 }
 
 .flight-card {
@@ -88,6 +282,197 @@ input, select {
 }
 
 .backBtn {
-  margin-top: 15px;
-  background: #888;
+  position: absolute;
+  margin-top: 20px;
+  background: #007BFF;
+}
+
+.error-message {
+  color: #d93025;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.login-signup {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  top: 20px;
+  right: 20px;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  color: #0d1013;
+  cursor: pointer;
+}
+
+.login-signup svg {
+  width: 16px;
+  height: 16px;
+  stroke: #0d1013;
+  stroke-width: 1.3;
+  fill: none;
+  transition: stroke 0.3s ease;
+}
+
+.login-signup span {
+  transition: color 0.3s ease;
+}
+
+.login-signup .icon:hover {
+  stroke: #007BFF;
+}
+
+.login-signup .login:hover,
+.login-signup .signup:hover {
+  color: #007BFF;
+}
+
+#bookingForm div {
+  display: flex;
+  flex-direction: column;
+}
+
+#bookingForm label {
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+#bookingForm button[type="submit"] {
+  margin-top: 10px;
+  background: #007BFF;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+#bookingForm button[type="submit"]:hover {
+  background: #0055aa;
+  transform: translateY(-2px);
+}
+
+#bookingError {
+  color: #d93025;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 8px;
+}
+
+#summary {
+  text-align: left;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 25px 30px;
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+}
+
+#summary h2 {
+  text-align: center;
+  color: #007BFF;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+#summary h3 {
+  color: #007BFF;
+  font-size: 18px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  border-left: 4px solid #007BFF;
+  padding-left: 8px;
+}
+
+#summary p {
+  margin: 6px 0;
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+#summary ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+}
+
+#summary ul li {
+  background: #f4f7fb;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 15px;
+  transition: background 0.3s ease;
+}
+
+#summary ul li:hover {
+  background: #eaf3ff;
+}
+
+#bookNowBtn {
+  display: block;
+  width: 100%;
+  background: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 25px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+#bookNowBtn:hover {
+  background: #0055aa;
+  transform: translateY(-2px);
+}
+
+#summaryDetails {
+  background: #fafbfc;
+  padding: 15px 20px;
+  border-radius: 8px;
+}
+
+#success {
+  text-align: center;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 40px 30px;
+}
+
+#success h2 {
+  color: #28a745;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+#success p {
+  font-size: 16px;
+  color: #555;
+}
+
+#backToHomeSuccess {
+  background: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 25px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+#backToHomeSuccess:hover {
+  background: #0055aa;
+  transform: translateY(-2px);
 }
