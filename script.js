@@ -31,6 +31,25 @@ const progressBar = document.getElementById('progressBar');
 let bookingData = {};
 let selectedFlight = null;
 
+// === REALISTIC FLIGHT DURATIONS ===
+function getFlightDuration(from, to) {
+  const routes = {
+    "Manila-Cebu": "1h 15m",
+    "Cebu-Manila": "1h 15m",
+    "Manila-Davao": "1h 50m",
+    "Davao-Manila": "1h 50m",
+    "Manila-Iloilo": "1h 10m",
+    "Iloilo-Manila": "1h 10m",
+    "Cebu-Davao": "1h 5m",
+    "Davao-Cebu": "1h 5m",
+    "Cebu-Iloilo": "55m",
+    "Iloilo-Cebu": "55m",
+    "Davao-Iloilo": "1h 25m",
+    "Iloilo-Davao": "1h 25m"
+  };
+  return routes[`${from}-${to}`] || "1h 20m";
+}
+
 // === FLIGHT DATABASE (All days in October) ===
 const flights = [];
 const origins = ["Manila", "Cebu", "Davao", "Iloilo"];
@@ -49,7 +68,7 @@ for (let day = 18; day <= 31; day++) {
       const price = 2500 + Math.floor(Math.random() * 1500);
       const fareType = Math.random() > 0.5 ? "Promo" : "Regular";
       const seats = 30 + Math.floor(Math.random() * 40);
-      const duration = "1h 20m";
+      const duration = getFlightDuration(from, to); // 👈 realistic hours of travel
       const terminal = "T" + (1 + Math.floor(Math.random() * 3));
       
       flights.push({ flightNo, from, to, date, time, price, fareType, seats, duration, terminal });
@@ -58,42 +77,26 @@ for (let day = 18; day <= 31; day++) {
 }
 
 // === UTILITY FUNCTIONS ===
-
-// Update TO options based on FROM selection
 function updateDestinationOptions() {
   const fromValue = fromSelect.value;
-
-  Array.from(toSelect.options).forEach(option => {
-    option.hidden = false; // show all first
-  });
-
-  // Hide the same option in "To"
+  Array.from(toSelect.options).forEach(option => option.hidden = false);
   if (fromValue) {
     const sameOption = Array.from(toSelect.options).find(opt => opt.value === fromValue);
     if (sameOption) sameOption.hidden = true;
   }
 }
 
-// Update FROM options based on TO selection
 function updateOriginOptions() {
   const toValue = toSelect.value;
-
-  Array.from(fromSelect.options).forEach(option => {
-    option.hidden = false; // show all first
-  });
-
-  // Hide the same option in "From"
+  Array.from(fromSelect.options).forEach(option => option.hidden = false);
   if (toValue) {
     const sameOption = Array.from(fromSelect.options).find(opt => opt.value === toValue);
     if (sameOption) sameOption.hidden = true;
   }
 }
 
-// Adjust modal height dynamically
 function adjustModalHeight() {
   const modal = document.querySelector('.background-process');
-
-  // If the modal is taller than the viewport, let it scroll naturally
   if (modal.scrollHeight > window.innerHeight * 0.8) {
     modal.style.top = '20px';
     modal.style.transform = 'translateX(-50%)';
@@ -102,7 +105,6 @@ function adjustModalHeight() {
     modal.style.transform = 'translate(-50%, -50%)';
   }
 }
-
 new ResizeObserver(adjustModalHeight).observe(document.querySelector('.background-process'));
 
 // === CORE NAVIGATION ===
@@ -110,81 +112,50 @@ function showSection(section) {
   [home, booking, flightsSection, passengerSection, summarySection, successSection]
     .forEach(sec => sec.classList.add('hidden'));
   section.classList.remove('hidden');
-
-  // Hide progress bar on home and success screens
-  if (section === home || section === successSection) {
-    progressBar.style.display = 'none';
-  } else {
-    progressBar.style.display = 'flex';
-  }
+  progressBar.style.display = (section === home || section === successSection) ? 'none' : 'flex';
 }
 
 function setActiveStep(stepIndex) {
   steps.forEach((s, i) => {
-    if (i < stepIndex) {
-      s.classList.add('completed');  // all previous steps stay colored
-      s.classList.remove('active');
-    } else if (i === stepIndex) {
-      s.classList.add('active');
-      s.classList.remove('completed');
-    } else {
-      s.classList.remove('active', 'completed');
-    }
+    if (i < stepIndex) s.classList.add('completed');
+    else if (i === stepIndex) s.classList.add('active');
+    else s.classList.remove('active', 'completed');
   });
 }
 
 // === EVENT LISTENERS ===
-
-// Listen for changes
 fromSelect.addEventListener('change', updateDestinationOptions);
 toSelect.addEventListener('change', updateOriginOptions);
 
-// Home → Booking
 bookFlightBtn.addEventListener('click', () => {
   showSection(booking);
   setActiveStep(0);
-
-  // Show progress wrapper
   document.querySelector('.background-process').style.display = 'block';
-
-  // Hide logo and login-signup
   document.querySelector('.logo').style.display = 'none';
   document.querySelector('.login-signup').style.display = 'none';
-
-  // Blur and fade background image
   document.querySelector('.background-img').classList.add('blurred');
 });
 
-// Booking → Flights
 bookingForm.addEventListener('submit', (e) => {
   e.preventDefault();
-
   const departDate = document.getElementById('departDate').value;
   const returnDate = document.getElementById('returnDate').value;
   const flightType = flightTypeSelect.value;
   const errorDisplay = document.getElementById('bookingError');
-
-  // Clear previous error
   errorDisplay.textContent = '';
 
-  // --- VALIDATION: Return date must be later than depart date ---
   if (flightType === 'round') {
     if (!returnDate) {
-      errorDisplay.textContent = '⚠ Please select a return date for a round trip.';
+      errorDisplay.textContent = 'Please select a return date for a round trip.';
       return;
     }
-
     const depart = new Date(departDate);
     const ret = new Date(returnDate);
-
     if (ret <= depart) {
-      errorDisplay.textContent = '⚠ Return date must be later than the departure date.';
+      errorDisplay.textContent = 'Return date must be later than the departure date.';
       return;
     }
   }
-
-  // Clear error and continue
-  errorDisplay.textContent = '';
 
   bookingData = {
     from: document.getElementById('from').value.trim(),
@@ -196,36 +167,25 @@ bookingForm.addEventListener('submit', (e) => {
   };
 
   displayFlights();
-
   document.querySelector('.flight-selection-process').style.display = 'block';
 });
 
-// Booking flight type toggle
 flightTypeSelect.addEventListener('change', () => {
-  const backgroundProcess = document.querySelector('.background-process');
-
   if (flightTypeSelect.value === 'oneway') {
     returnDateContainer.style.display = 'none';
   } else {
     returnDateContainer.style.display = 'flex';
     returnDateContainer.style.flexDirection = 'column';
   }
-
-  // --- Dynamic height adjustment ---
-  backgroundProcess.style.height = 'auto';
-  const newHeight = backgroundProcess.scrollHeight + 'px';
-  backgroundProcess.style.height = newHeight;
+  const backgroundProcess = document.querySelector('.background-process');
+  backgroundProcess.style.height = backgroundProcess.scrollHeight + 'px';
 });
 
-// Back to booking
 backToBooking.addEventListener('click', () => {
   showSection(booking);
   setActiveStep(0);
-
   document.querySelector('.flight-selection-process').style.display = 'none';
 });
-
-// === FEATURE-SPECIFIC FUNCTIONS ===
 
 // === FLIGHT LIST GENERATION ===
 function displayFlights() {
@@ -250,6 +210,7 @@ function displayFlights() {
     card.innerHTML = `
       <strong>${f.flightNo}</strong> — ${f.from} → ${f.to}<br>
       <strong>Date:</strong> ${f.date} ${f.time}<br>
+      <strong>Duration:</strong> ${f.duration}<br>
       <strong>Price:</strong> ₱${f.price} | <strong>Seats:</strong> ${f.seats}<br>
       <strong>Fare:</strong> ${f.fareType} | <strong>Terminal:</strong> ${f.terminal}
     `;
@@ -285,14 +246,12 @@ function selectFlight(flight) {
       <hr>
     `;
   }
-
   passengerForm.innerHTML += `<button type="submit">Continue to Summary</button>`;
 }
 
 // === PASSENGER INFO → SUMMARY ===
 passengerForm.addEventListener('submit', (e) => {
   e.preventDefault();
-
   const passengerDetails = [];
   let formValid = true;
 
@@ -300,12 +259,10 @@ passengerForm.addEventListener('submit', (e) => {
     const name = e.target[`name${i}`].value.trim();
     const age = parseInt(e.target[`age${i}`].value);
     const email = e.target[`email${i}`].value.trim();
-
     if (!name || !email || age < 1) {
       formValid = false;
       break;
     }
-
     passengerDetails.push({ name, age, email });
   }
 
@@ -318,7 +275,6 @@ passengerForm.addEventListener('submit', (e) => {
   showSummary();
 });
 
-// === SHOW SUMMARY ===
 function showSummary() {
   showSection(summarySection);
   setActiveStep(3);
@@ -327,12 +283,15 @@ function showSummary() {
     <li>${p.name} — Age: ${p.age} — Email: ${p.email}</li>
   `).join('');
 
+  const totalPrice = selectedFlight.price * bookingData.passengers;
+
   summaryDetails.innerHTML = `
     <h3>Flight Information</h3>
     <p>${selectedFlight.flightNo} | ${selectedFlight.from} → ${selectedFlight.to}</p>
     <p>${selectedFlight.date} ${selectedFlight.time}</p>
+    <p><strong>Duration:</strong> ${selectedFlight.duration}</p>
     <p><strong>Terminal:</strong> ${selectedFlight.terminal}</p>
-    <p>₱${selectedFlight.price} x ${bookingData.passengers} passenger(s)</p>
+    <p><strong>Total Price:</strong> ₱${totalPrice}</p>
 
     <h3>Passenger Details (${bookingData.passengers})</h3>
     <ul>${passengerList}</ul>
@@ -345,18 +304,26 @@ document.getElementById('bookNowBtn').addEventListener('click', () => {
   steps.forEach(s => s.classList.remove('active'));
 });
 
-// === BOOK ANOTHER (Back to Home from success page) ===
+// === BOOK ANOTHER ===
 document.getElementById('backToHomeSuccess').addEventListener('click', () => {
   showSection(home);
   steps.forEach(s => s.classList.remove('active'));
-
-  // Restore visibility of logo and login-signup
   document.querySelector('.logo').style.display = 'block';
   document.querySelector('.login-signup').style.display = 'flex';
-
-  // Hide modals and remove blur
   document.querySelector('.background-process').style.display = 'none';
   document.querySelector('.background-img').classList.remove('blurred');
+  document.querySelector('.flight-selection-process').style.display = 'none';
+});
 
+const backToHomeBtn = document.getElementById('backToHome');
+
+backToHomeBtn.addEventListener('click', (e) => {
+  e.preventDefault(); // Prevent form submission
+  showSection(home);
+  steps.forEach(s => s.classList.remove('active'));
+  document.querySelector('.logo').style.display = 'block';
+  document.querySelector('.login-signup').style.display = 'flex';
+  document.querySelector('.background-process').style.display = 'none';
+  document.querySelector('.background-img').classList.remove('blurred');
   document.querySelector('.flight-selection-process').style.display = 'none';
 });
